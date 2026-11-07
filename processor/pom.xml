@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>io.github.mtsdurica</groupId>
+		<artifactId>freezerplate-parent</artifactId>
+		<version>0.1.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>freezerplate-processor</artifactId>
+
+	<dependencies>
+		<!-- Only the annotations are needed; excluding transitive dependencies keeps Spring
+		     and Hibernate off the compiler classpath when the processor runs -->
+		<dependency>
+			<groupId>io.github.mtsdurica</groupId>
+			<artifactId>freezerplate</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- JPA annotations, read at compile time to detect relations and their owning side -->
+		<dependency>
+			<groupId>jakarta.persistence</groupId>
+			<artifactId>jakarta.persistence-api</artifactId>
+		</dependency>
+		<!-- JavaPoet: builds the generated controllers, DTOs and mappers as Java source -->
+		<dependency>
+			<groupId>com.squareup</groupId>
+			<artifactId>javapoet</artifactId>
+		</dependency>
+		<!-- AutoService: registers the processor in META-INF/services at build time -->
+		<dependency>
+			<groupId>com.google.auto.service</groupId>
+			<artifactId>auto-service-annotations</artifactId>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>com.google.auto.service</groupId>
+							<artifactId>auto-service</artifactId>
+							<version>${autoservice.version}</version>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
