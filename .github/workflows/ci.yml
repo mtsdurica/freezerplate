@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [dev, master]
+
+permissions:
+  contents: read
+
+# A newer push to the same branch or pull request makes the running build obsolete.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build (Java ${{ matrix.java }})
+    runs-on: ubuntu-latest
+    strategy:
+      # Report every Java version, so a failure on one does not hide the result of the other.
+      fail-fast: false
+      matrix:
+        # 17 is the minimum supported version, 25 the newest LTS.
+        java: ['17', '25']
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: maven
+
+      - name: Build and test
+        run: ./mvnw --batch-mode --no-transfer-progress verify
